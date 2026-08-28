@@ -12,25 +12,46 @@ Release and submission reviews often miss basics: incomplete documentation, abse
 
 ```text
 project-audit/
+├── install.ps1                    # Windows Skill and optional GitHub MCP installer
 ├── SKILL.md                       # Agent instructions, workflow, safety boundaries, and status model
 ├── README.md                      # Installation and usage guide
 ├── scripts/
 │   ├── detect_project.py          # Project, ecosystem, package-manager, and workspace detection
 │   ├── inspect_repo.py            # Deterministic repository-quality signals
 │   └── check_git.py               # Read-only Git state inspection
-└── references/
-    └── audit-checklist.md         # Severity and assessment rules
+├── references/
+│   └── audit-checklist.md         # Severity and assessment rules
+└── mcp-server/                    # Optional read-only GitHub MCP Server
 ```
 
-## Installation
+## Quick Install
 
-Copy or clone this directory into a skill discovery directory, keeping the directory name `project-audit`. For Codex, a typical personal installation is:
+Windows PowerShell or PowerShell 7:
+
+```powershell
+git clone <project-audit-skill-repository-url> project-audit-skill
+cd project-audit-skill
+.\install.ps1
+```
+
+The installer places the Skill in `$HOME\.agents\skills\project-audit` and optionally installs the GitHub MCP integration in `$HOME\.codex\mcp\project-audit-github`.
+
+- Local project auditing does not require a GitHub token.
+- The GitHub MCP integration is optional and requires Python 3.10 or newer.
+- For GitHub access, prefer a fine-grained personal access token with only Metadata read, Pull requests read, and Actions read permissions.
+- Restart Codex Desktop after installing or updating the MCP integration.
+
+## Manual Installation
+
+Copy `SKILL.md`, `scripts/`, and `references/` into the following directory:
 
 ```text
-~/.codex/skills/project-audit/
+~/.agents/skills/project-audit/
 ```
 
-The installed directory must contain `SKILL.md` at its root. No Python dependencies are required beyond Python 3; the scripts use only the standard library.
+The installed directory must contain `SKILL.md` at its root. The local audit scripts use only the Python standard library.
+
+To install the optional GitHub MCP manually, copy `mcp-server/server.py` and `mcp-server/pyproject.toml` into a separate user directory, create a Python 3.10+ virtual environment, run `python -m pip install -e .` with that environment, and configure the stdio server in `$HOME\.codex\config.toml`. Set `GITHUB_TOKEN` in `$HOME\.codex\.env`; never place the token in the repository or `config.toml`.
 
 ## Invocation
 
