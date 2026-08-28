@@ -2,6 +2,8 @@
 
 `project-audit` is a reusable Agent Skill for reviewing an arbitrary software repository's engineering quality and its readiness for submission or release. It combines deterministic, read-only Python checks with an Agent's contextual judgment.
 
+When a compatible read-only GitHub MCP server is available, the Skill can optionally supplement local evidence with remote repository metadata, open pull requests, and recent GitHub Actions runs. The local audit remains complete and usable without MCP.
+
 ## Why use it?
 
 Release and submission reviews often miss basics: incomplete documentation, absent CI, stale temporary files, unclear environment setup, uncommitted work, or build and test commands that were never verified. This Skill provides a consistent evidence-gathering workflow without assuming a particular framework or business domain.
@@ -49,13 +51,16 @@ For automatic discovery, install it in the Agent's configured skills directory a
 - Reports package-level Node scripts and capabilities without hiding differences between packages.
 - Flags common temporary artifacts and classifies potentially sensitive filenames as tracked, ignored, untracked, or unknown without reading their contents.
 - Reports branch, working-tree state, changed paths, recent commit metadata, and remotes using read-only Git commands.
+- Optionally uses `get_repository_info`, `get_open_pull_requests`, and `get_ci_status` for remote GitHub evidence during release, submission, PR, CI, or remote-repository reviews.
+- Separates final results into Local Evidence, Remote Evidence, and Agent Assessment.
 - Produces one overall assessment: `READY`, `READY WITH MINOR FIXES`, or `NOT READY`.
 
 ## Current limitations
 
 - Detection is heuristic and cannot understand every ecosystem or repository convention.
 - Presence of a file or script does not prove that a build, test, lint, typecheck, or CI workflow succeeds.
-- The scripts do not install dependencies, execute builds or tests, validate remote CI status, inspect hosted pull requests, or access the network.
+- The local scripts do not install dependencies, execute builds or tests, validate remote CI status, inspect hosted pull requests, or access the network. Remote GitHub checks require a separately configured compatible MCP server.
+- If the GitHub MCP server, credentials, network, repository identity, or required tools are unavailable, remote checks are reported as not performed and the local audit continues.
 - Possible sensitive-file findings are filename-based; this version does not scan file contents for secrets.
 - Large or unusual repositories may contain relevant configuration outside the bounded scan depth or ignored directories.
 - The Skill does not fix issues, deploy software, publish releases, or perform destructive Git or database operations.

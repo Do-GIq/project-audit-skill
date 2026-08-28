@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "project-audit-github-mcp"
+version = "0.1.0"
+description = "Read-only GitHub MCP server for project-audit"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=2,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mcp[cli]>=2,<3",
+]
+
+[tool.hatch.build.targets.wheel]
+only-include = ["server.py"]
